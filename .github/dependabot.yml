@@ -2,7 +2,7 @@ version: 2
 updates:
   # Update Dockerfile
   - package-ecosystem: "docker"
-    directory: "/"
+    directory: "/kubernetes"
     schedule:
       interval: "daily"
     commit-message:
