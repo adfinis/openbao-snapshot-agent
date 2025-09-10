@@ -1,0 +1,100 @@
+---
+
+- name: Add bao group
+  become: true
+  group:
+    name: "{{ bao_group }}"
+    state: present
+
+- name: Add bao user
+  become: true
+  user:
+    name: "{{ bao_user }}"
+    comment: "OpenBao user"
+    group: "{{ bao_group }}"
+    system: true
+
+- name: ensure OpenBao snapshot config dir
+  become: true
+  file:
+    path: '{{ bao_snapshot_config_dir }}'
+    state: directory
+    mode: '0700'
+    owner: '{{ bao_user }}'
+    group: '{{ bao_group }}'
+
+- name: write roleid
+  become: true
+  copy:
+    dest: '{{ bao_snapshot_approle_roleid_file }}'
+    content: '{{ bao_raft_bck_role_id }}'
+    mode: '0640'
+    owner: '{{ bao_user }}'
+    group: '{{ bao_group }}'
+
+- name: write secretid
+  no_log: yes
+  become: true
+  copy:
+    dest: '{{ bao_snapshot_approle_secretid_file }}'
+    content: '{{ bao_raft_bck_secret_id }}'
+    mode: '0640'
+    owner: '{{ bao_user }}'
+    group: '{{ bao_group }}'
+
+- name: write snapshot agent configuration file
+  become: true
+  template:
+    src: '{{ bao_snapshot_agent_config_file_template }}'
+    dest: '{{ bao_snapshot_agent_config_file }}'
+    mode: '0640'
+    owner: '{{ bao_user }}'
+    group: '{{ bao_group }}'
+
+# OpenBao backup agent systemd config
+- name: create systemd service file for backup agent
+  become: true
+  template:
+    src: 'templates{{ bao_snapshot_systemd_dir }}/{{ bao_snapshot_systemd_service_name }}.j2'
+    dest: '{{ bao_snapshot_systemd_dir }}/{{ bao_snapshot_systemd_service_name }}'
+  notify:
+    - daemon reload
+
+- name: start and enable systemd service
+  become: true
+  service:
+    name: '{{ bao_snapshot_systemd_service_name }}'
+    enabled: yes
+    state: started
+
+# Timer systemd config
+- name: create systemd timer service file for snapshot service
+  become: true
+  template:
+    src: 'templates{{ bao_snapshot_systemd_dir }}/{{ bao_snapshot_systemd_timer_service_name }}.j2'
+    dest: '{{ bao_snapshot_systemd_dir }}/{{ bao_snapshot_systemd_timer_service_name }}'
+  notify:
+    - daemon reload
+
+- name: create systemd timer file for snapshot service
+  become: true
+  template:
+    src: 'templates{{ bao_snapshot_systemd_dir }}/{{ bao_snapshot_systemd_timer_name }}.j2'
+    dest: '{{ bao_snapshot_systemd_dir }}/{{ bao_snapshot_systemd_timer_name }}'
+  notify:
+    - daemon reload
+
+- name: ensure snapshot directory exists
+  become: true
+  file:
+    path: '{{ bao_snapshot_dir }}'
+    state: directory
+    mode: '0755'
+    owner: '{{ bao_user }}'
+    group: '{{ bao_group }}'
+
+- name: start systemd timer
+  become: true
+  service:
+    name: '{{ bao_snapshot_systemd_timer_name }}'
+    state: started

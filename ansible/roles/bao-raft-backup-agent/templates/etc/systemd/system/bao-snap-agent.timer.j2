@@ -1,0 +1,11 @@
+[Unit]
+Description={{ bao_snapshot_systemd_timer_description }}
+
+[Timer]
+Unit={{ bao_snapshot_systemd_timer_service_name }}
+
+OnActiveSec={{ bao_snapshot_systemd_timer_onactivesec }}
+OnUnitActiveSec={{ bao_snapshot_systemd_timer_onunitactivesec }}
+
+[Install]
+WantedBy=timers.target

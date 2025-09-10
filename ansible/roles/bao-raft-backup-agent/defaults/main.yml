@@ -1,0 +1,83 @@
+---
+
+# OpenBao configuration directory
+bao_snapshot_config_dir: '/etc/bao.d'
+# OpenBao for pid file
+bao_snapshot_pid_file_name: 'bao-raft-backup-agent.pid'
+# Location of pid file
+bao_snapshot_pid_dir: '{{ bao_snapshot_config_dir }}'
+# Systemd runtime directory
+bao_snapshot_run_dir: 'bao-raft-backup-agent'
+# OpenBao agent listener unix socket
+bao_snapshot_listener_socket: '{{ bao_snapshot_config_dir }}/agent.sock'
+
+# OpenBao API address
+bao_address: '127.0.0.1:8200'
+# OpenBao API tls, choosing 'no' here will change the protocol
+# for bao_address from 'http' (default, for dev server) to 'https'
+bao_tls_disable: yes
+# Path on the local disk to a single PEM-encoded CA certificate to verify the OpenBao server's SSL certificate
+# only one of bao_ca_cert or bao_ca_path should be used
+bao_ca_cert: ""
+# Path on the local disk to a directory of PEM-encoded CA certificates to verify the OpenBao server's SSL certificate
+bao_ca_path: ""
+# Name to use as the SNI host when connecting via TLS
+bao_tls_server_name: ""
+# Disable verification of TLS certificates. Using this option is highly discouraged as it decreases the security of data transmissions to and from the OpenBao server
+bao_tls_skip_verify: no
+
+# OpenBao snapshot agent config file destination on remote host
+bao_snapshot_agent_config_file: '{{ bao_snapshot_config_dir }}/bao_snapshot_agent.hcl'
+# OpenBao snapshot agent config file template
+bao_snapshot_agent_config_file_template: 'templates{{ bao_snapshot_config_dir }}/bao_snapshot_agent.hcl.j2'
+
+# Systemd directory for service and timer files on remote host
+bao_snapshot_systemd_dir: '/etc/systemd/system'
+# Systemd service name for snapshot agent
+bao_snapshot_systemd_service_name: 'bao-raft-backup-agent.service'
+
+# Systemd timer name
+bao_snapshot_systemd_timer_name: 'bao-snap-agent.timer'
+# Systemd timer service name; this service performs the actual snapshotting
+bao_snapshot_systemd_timer_service_name: 'bao-snap-agent.service'
+# Systemd timer OnActiveSec, run 1s after activation
+bao_snapshot_systemd_timer_onactivesec: '1s'
+# Systemd timer OnUnitActiveSec, run monotonic timer every hour after activation
+bao_snapshot_systemd_timer_onunitactivesec: '1h'
+# Systemd timer description
+bao_snapshot_systemd_timer_description: OpenBao integrated storage snapshot'
+
+# Owner/Group for configuration directory and files
+bao_user: bao
+bao_group: bao
+
+# Path to bao binary
+bao_bin_path: '/usr/bin'
+
+# Variables for actual AppRole roleid and secretid. These variables can be defined
+# manually or generated with the terraform configuration from this repo.
+# Use Ansible OpenBao to encrypt the secretid.
+bao_raft_bck_role_id: ''
+bao_raft_bck_secret_id: 'sensitive'
+
+# path to roleid and secretid files for AppRole auth
+bao_snapshot_approle_roleid_file: '{{ bao_snapshot_config_dir }}/snap-roleid'
+bao_snapshot_approle_secretid_file: '{{ bao_snapshot_config_dir }}/snap-secretid'
+
+# This can be set to false to disable the default behavior
+# of removing the secret ID file after it's been read:
+# https://openbao.org/docs/agent-and-proxy/autoauth/methods/approle
+remove_secret_id_file_after_reading: yes
+
+# Snapshot output directory
+bao_snapshot_dir: '/opt/bao/snapshots'
+# Snapshot file name format
+bao_snapshot_file_name: 'bao-raft_$(date +%%F-%%H%%M).snapshot'
+
+# Snapshot retention find time filter,
+# one of 'mtime' or 'atime', see `man find`
+bao_snapshot_retention_find_mode: 'mtime'
+# Snapshot retention, data was last modified/accessed 7*24 hours ago
+bao_snapshot_retention_time: '+7'
+# Action to take on expired files
+bao_snapshot_retention_find_action: 'rm'
