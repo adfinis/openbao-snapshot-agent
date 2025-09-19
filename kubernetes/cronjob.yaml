@@ -35,6 +35,9 @@ spec:
               # leave empty to retain snapshot files (default)
             - name: S3_EXPIRE_DAYS
               value:
+              # Leave empty to use system trust store, use "--ca-certs=" to specify the path to the CA or "--no-check-certificate" to skip TLS verification
+            - name: S3CMD_EXTRA_FLAG
+              value:
             - name: BAO_AUTH_PATH
               value: kubernetes
             - name: BAO_ROLE
