@@ -54,7 +54,7 @@ spec:
                 secretKeyRef:
                   key: aws_access_key_id
                   name: bao-snapshot-credentials
-            image: ghcr.io/adfinis/bao-snapshot:0.1.0
+            image: ghcr.io/adfinis/bao-snapshot:0.2.1
             volumeMounts:
               - name: snapshot-dir
                 mountPath: /bao-snapshots
