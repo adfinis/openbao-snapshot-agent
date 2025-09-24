@@ -9,6 +9,7 @@ Essentially, we configure an [OpenBao Agent](https://openbao.org/docs/agent-and-
 #### OpenBao Policy
 
 Policy for the snapshot agent:
+
 ```bash
 echo '
 path "sys/storage/raft/snapshot" {
@@ -18,17 +19,17 @@ path "sys/storage/raft/snapshot" {
 
 #### AppRole Authentication
 
-These manual steps for AppRole authentication are automated in the [./terraform](./terraform) code.
-
 Enable AppRole and create the `bao-snap-agent` role:
+
 ```bash
 bao auth enable approle
 bao write auth/approle/role/bao-snap-agent token_ttl=2h token_policies=snapshot
-bao read auth/approle/role/bao-snap-agent/role-id -format=json | jq -r .data.role_id 
+bao read auth/approle/role/bao-snap-agent/role-id -format=json | jq -r .data.role_id
 bao write -f auth/approle/role/bao-snap-agent/secret-id -format=json | jq -r .data.secret_id
 ```
 
 On all OpenBao servers:
+
 ```bash
 echo "<role_id>" > /etc/bao.d/snap-secretid
 echo "<secretd_id>" > /etc/bao.d/snap-roleid
@@ -43,6 +44,7 @@ The OpenBao agent and systemd timer can also be automatically deployed using the
 ### Manual steps
 
 Configure the OpenBao Agent for the snapshots:
+
 ```bash
 cat << EOF > /etc/bao.d/bao_snapshot_agent.hcl
 # OpenBao agent configuration for Raft snapshots
@@ -83,6 +85,7 @@ EOF
 #### Vault Agent Systemd Service
 
 Configure the systemd service for the snapshot agent:
+
 ```bash
 cat << EOF > /etc/systemd/system/bao-snap-agent.service
 [Unit]
@@ -107,6 +110,7 @@ EOF
 ```
 
 Start the agent on all OpenBao servers:
+
 ```bash
 systemctl daemon-reload
 systemctl enable --now bao-snap-agent
@@ -117,6 +121,7 @@ systemctl enable --now bao-snap-agent
 Create a cronjob or an systemd service/timer unit (matter of preference).
 
 Create a script to execute the snapshot:
+
 ```bash
 cat << 'EOF' > /usr/local/bin/bao-snapshot
 #!/bin/sh
@@ -132,32 +137,38 @@ EOF
 ```
 
 Make the script executable:
+
 ```bash
 chmod +x /usr/local/bin/bao-snapshot
 ```
 
 Take hourly snapshots with cron, make sure the cronjobs are evenly spaced out every hour (e.g. server1: Minute 0, server2: Minute 20, server3: Minute 40):
+
 ```bash
 echo "0 * * * * root /usr/local/bin/bao-snapshot" >> /etc/crontab
 ```
 
 Test the script (errors probably in `/var/spool/mail/root`):
+
 ```bash
 vault-snapshot
 ```
 
 ## Sync with remote storage
+
 ### S3
 
 Install s3cmd: https://github.com/s3tools/s3cmd/releases
 
 Configure s3cmd:
+
 ```bash
 s3cmd --configure
 s3cmd mb s3://raft-snapshots
 ```
 
 Add s3cmd sync to `bao-snapshot`:
+
 ```bash
 echo "/usr/bin/s3cmd sync /opt/bao/snapshots/* s3://raft-snapshots" >> /usr/local/bin/bao-snapshot
 ```
@@ -165,6 +176,7 @@ echo "/usr/bin/s3cmd sync /opt/bao/snapshots/* s3://raft-snapshots" >> /usr/loca
 ## Retention
 
 For an retention of 7 days (locally, not on the remote storage) you need to add the following to the `bao-snapshot` script:
+
 ```
 find /opt/bao/snapshots/* -mtime +7 -exec rm {} \;
 ```
