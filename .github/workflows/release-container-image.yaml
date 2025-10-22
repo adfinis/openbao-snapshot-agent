@@ -9,6 +9,11 @@ on:
     tags:
       - 'v*.*.*'
 
+permissions:
+  contents: write
+  id-token: write
+  packages: write
+
 jobs:
   container:
     runs-on: ubuntu-latest
