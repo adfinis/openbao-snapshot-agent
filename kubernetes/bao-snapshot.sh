@@ -3,7 +3,7 @@
 set -e
 
 # Authenticate with OpenBao
-JWT=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+JWT=$(cat "${TOKEN_PATH:=/var/run/secrets/kubernetes.io/serviceaccount/token}")
 export JWT
 
 echo "Using OpenBao auth path: $BAO_AUTH_PATH"
