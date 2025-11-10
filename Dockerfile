@@ -1,6 +1,6 @@
 FROM alpine
 
-ARG BAO_VERSION=2.4.0
+ARG BAO_VERSION=2.4.3
 
 COPY kubernetes/bao-snapshot.sh /
 
