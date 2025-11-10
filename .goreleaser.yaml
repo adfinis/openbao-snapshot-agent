@@ -1,0 +1,12 @@
+builds:
+  - skip: true
+dockers_v2:
+  - images:
+      - "ghcr.io/openbao/openbao-snapshot-agent"
+      - "docker.io/openbao/openbao-snapshot-agent"
+      - "quay.io/openbao/openbao-snapshot-agent"
+    tags:
+      - "{{ .Version }}"
+      - "{{ if not .IsNightly }}latest{{ end }}"
+    extra_files:
+      - "kubernetes/bao-snapshot.sh"
