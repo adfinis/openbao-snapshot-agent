@@ -1,8 +1,8 @@
 FROM alpine
 
-ARG BAO_VERSION=2.4.0
+ARG BAO_VERSION=2.4.3
 
-COPY bao-snapshot.sh /
+COPY kubernetes/bao-snapshot.sh /
 
 RUN wget https://github.com/openbao/openbao/releases/download/v${BAO_VERSION}/bao_${BAO_VERSION}_Linux_x86_64.tar.gz && \
     tar xzf bao_${BAO_VERSION}_Linux_x86_64.tar.gz && \ 
