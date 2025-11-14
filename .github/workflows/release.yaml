@@ -43,6 +43,10 @@ jobs:
         with:
           go-version: stable
           check-latest: true
+          
+      # Supports syft/sbom generation
+      - uses: anchore/sbom-action/download-syft@8e94d75ddd33f69f691467e42275782e4bfefe84 # v0.20.9
+        if: inputs.dogorelease
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
