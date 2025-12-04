@@ -10,3 +10,4 @@ dockers_v2:
       - "{{ if not .IsNightly }}latest{{ end }}"
     extra_files:
       - "kubernetes/bao-snapshot.sh"
+    sbom: false
